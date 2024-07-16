@@ -13,7 +13,7 @@ mlfw_mat_double * mlfw_mat_double_create_new(dimension_t rows,dimension_t column
     index_t r,k;
     if(rows<0 || columns<0) return NULL;
     matrix=(mlfw_mat_double *)malloc(sizeof(mlfw_mat_double));
-    if(matrix==NULL) return NULL;m
+    if(matrix==NULL) return NULL;
     matrix->data=(double **)malloc(sizeof(double *)*rows);
     if(matrix->data==NULL)
     {
@@ -97,6 +97,22 @@ mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name)
     return matrix;
 }
 
+double mlfw_mat_double_get(mlfw_mat_double *matrix,index_t row,index_t column)
+{
+    double value=0.0;
+    if(matrix==NULL) return value;
+    if(row<0 && row>=matrix->rows) return value;
+    if(column<0 && row>=matrix->columns) return value;
+    return matrix->data[row][column];
+}
+void mlfw_mat_double_set(mlfw_mat_double *matrix,index_t row,index_t column,double value)
+{
+    if(matrix==NULL) return;
+    if(row<0 && row>=matrix->rows) return;
+    if(column<0 && row>=matrix->columns) return;
+    matrix->data[row][column]=value;
+}
+
 
 // void test_new_and_create()
 // {
@@ -108,7 +124,8 @@ mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name)
 //     {
 //         for(c=0;c<matrix->columns;c++)
 //         {
-//             matrix->data[r][c]=value;
+//             // matrix->data[r][c]=value;
+//             mlfw_mat_double_set(matrix,r,c,value);
 //             value+=10.20;
 //         }
 //     }
@@ -117,7 +134,7 @@ mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name)
 //     {
 //         for(c=0;c<matrix->columns;c++)
 //         {
-//             printf("%20.10lf ",matrix->data[r][c]);
+//             printf("%20.10lf ",mlfw_mat_double_get(matrix,r,c));
 //         }
 //         printf("\n");
 //     }
