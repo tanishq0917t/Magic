@@ -13,4 +13,7 @@ void mlfw_mat_double_copy(mlfw_mat_double *target,mlfw_mat_double *source,index_
 void mlfw_mat_double_fill(mlfw_mat_double *matrix,index_t from_row_index,index_t from_column_index,index_t upto_row_index,index_t upto_column_index,index_t what_to_fill);
 
 mlfw_column_vector_double * mlfw_mat_double_create_column_vec(mlfw_mat_double * matrix,index_t index);
+
+mlfw_mat_double * mlfw_mat_double_shuffle(mlfw_mat_double *matrix,uint8_t shuffle_count);
+void mlfw_mat_double_to_csv(mlfw_mat_double *matrix, char *csv_file_name);
 #endif
