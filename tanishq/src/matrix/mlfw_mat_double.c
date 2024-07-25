@@ -196,14 +196,14 @@ mlfw_mat_double * mlfw_mat_double_shuffle(mlfw_mat_double *matrix,uint8_t shuffl
     if(shuffled_matrix==NULL) return NULL;
     mlfw_mat_double_copy(shuffled_matrix,matrix,0,0,0,0,matrix->rows-1,matrix->columns-1);
 
-    for(index_t r=0;r<shuffled_matrix->rows;r++)
-    {
-        for(index_t c=0;c<shuffled_matrix->columns;c++)
-        {
-            printf("%lf ",shuffled_matrix->data[r][c]);
-        }
-        printf("\n");
-    }
+    // for(index_t r=0;r<shuffled_matrix->rows;r++)
+    // {
+    //     for(index_t c=0;c<shuffled_matrix->columns;c++)
+    //     {
+    //         printf("%lf ",shuffled_matrix->data[r][c]);
+    //     }
+    //     printf("\n");
+    // }
 
     int r;
     index_t u,swp_idx,a,b;
