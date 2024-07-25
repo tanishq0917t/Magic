@@ -2,6 +2,7 @@
 #include<mlfw_vector.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include<time.h>
 typedef struct __mlfw_mat_double
 {
     double **data;
@@ -133,7 +134,7 @@ void mlfw_mat_double_copy(mlfw_mat_double *target,mlfw_mat_double *source,index_
     index_t source_r,source_c;
     target_r=target_row_index;
     source_r=source_from_row_index;
-    while (source_r<=source_from_row_index)
+    while (source_r<=source_to_row_index) //big change
     {
         target_c=target_column_index;
         source_c=source_from_column_index;
@@ -142,8 +143,6 @@ void mlfw_mat_double_copy(mlfw_mat_double *target,mlfw_mat_double *source,index_
             if(target_r>=0 && target_r<target->rows && target_c>=0 && target_c<target->columns)
             {
                 target->data[target_r][target_c]=source->data[source_r][source_c];
-                target_r++;
-                target_c++;
             }
             source_c++;
             target_c++;
@@ -186,4 +185,66 @@ mlfw_column_vector_double * mlfw_mat_double_create_column_vec(mlfw_mat_double * 
         mlfw_column_vector_double_set(vector,r,matrix->data[r][index]);
     }
     return vector;
+}
+
+mlfw_mat_double * mlfw_mat_double_shuffle(mlfw_mat_double *matrix,uint8_t shuffle_count)
+{
+    if(matrix==NULL) return NULL;
+    if(shuffle_count==0) return NULL;
+    mlfw_mat_double *shuffled_matrix;
+    shuffled_matrix=mlfw_mat_double_create_new(matrix->rows,matrix->columns);
+    if(shuffled_matrix==NULL) return NULL;
+    mlfw_mat_double_copy(shuffled_matrix,matrix,0,0,0,0,matrix->rows-1,matrix->columns-1);
+
+    for(index_t r=0;r<shuffled_matrix->rows;r++)
+    {
+        for(index_t c=0;c<shuffled_matrix->columns;c++)
+        {
+            printf("%lf ",shuffled_matrix->data[r][c]);
+        }
+        printf("\n");
+    }
+
+    int r;
+    index_t u,swp_idx,a,b;
+    double temp;
+    b=shuffled_matrix->rows-1;
+    srand(time(NULL));
+    for(uint8_t i=0;i<shuffle_count;i++)
+    {
+        for(u=0;u<=shuffled_matrix->rows-3;u++)
+        {
+            a=u+1;
+            r=rand();
+            swp_idx=(r%(b-a+1))+a;
+            for(index_t c=0;c<shuffled_matrix->columns;c++)
+            {
+                temp=shuffled_matrix->data[u][c];
+                shuffled_matrix->data[u][c]=shuffled_matrix->data[swp_idx][c];
+                shuffled_matrix->data[swp_idx][c]=temp;
+            }
+        }
+    }
+    return shuffled_matrix;
+}
+
+void mlfw_mat_double_to_csv(mlfw_mat_double *matrix,char *csv_file_name)
+{
+    index_t r,c;
+    char separator;
+    FILE *file;
+    if(matrix==NULL || csv_file_name==NULL) return;
+    file=fopen(csv_file_name,"w");
+    if(file==NULL) return;
+    for(r=0;r<matrix->rows;r++)
+    {
+        for(c=0;c<matrix->columns;c++)
+        {
+            fprintf(file,"%lf",matrix->data[r][c]);
+            if(c==matrix->columns-1) separator='\n';
+            else separator=',';
+            fputc(separator,file);
+        }
+    }
+    fclose(file);
 }
