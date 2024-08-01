@@ -7,7 +7,7 @@ gcc filename.c -I ../tanishq/include/ -L ../tanishq/lib/ -ltanishq -o filename -
 ```-L``` -> where is library file?\
 ```-l``` -> library name? (without lib prefix)\
 ```-Wall``` -> To show all warnings as error during compilation
-### Creating Training and Testing Data 
+### Using Tool to generate Training and Testing Data 
 ```
 Usage: [create_test_train_dataset dataset test_file train_file minor_percentage]
 ```
