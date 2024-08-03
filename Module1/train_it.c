@@ -121,6 +121,7 @@ void train_it()
         mlfw_column_vector_double_destroy(m);
         return;
     }
+    mlfw_mat_double_fill(history,0,0,history_rows-1,history_columns-1,0.0);
     while (STOP_FLAG==0)
     {
         if(k==NO_OF_ITERATIONS) break;
@@ -190,6 +191,29 @@ void train_it()
         //printf("Final_error_value: %lf\n", final_error_value);
         printf("Iteration Number: %" PRIu64",Error: %41.15lf\n",k,final_error_value);
 
+        iteration_no=(double)k;
+        //logic to add history starts here
+        if(history_index==HISTORY_SIZE)
+        {
+            for(index_t i=1;i<HISTORY_SIZE;i++)
+            {
+                for(index_t j=0;j<history_columns;j++)
+                {
+                    mlfw_mat_double_set(history,i-1,j,mlfw_mat_double_get(history,i,j));
+                }
+            }
+            history_index--;
+        }
+        mlfw_mat_double_set(history,history_index,0,iteration_no);
+        mlfw_mat_double_set(history,history_index,1,final_error_value);
+        index_t j=mlfw_column_vector_double_get_size(m);
+        for(index_t i=0;i<j;i++)
+        {
+            mlfw_mat_double_set(history,history_index,i+2,mlfw_column_vector_double_get(m,i));
+        }
+        history_index++;
+
+        
         ITE = mlfw_multiply_double_matrix_with_column_vector(IT, E);
         if (ITE == NULL)
         {
@@ -279,7 +303,7 @@ int main(int argc,char *argv[])
 
     if(argc!=5 && argc!=6)
     {
-        printf("Usage: train.out dataset_name learning_rate history_size history_file_name no_of_iterations(optional)");
+        printf("Usage: train.out dataset_name learning_rate history_size history_file_name no_of_iterations(optional)\n");
         return 0;
     }
     char *ptr=NULL;
