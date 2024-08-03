@@ -15,6 +15,7 @@ uint8_t STOP_FLAG=0;
 
 void train_it()
 {
+    FILE *graph_file;
     double iteration_no;
     mlfw_mat_double *history;
     dimension_t history_rows,history_columns;
@@ -122,6 +123,7 @@ void train_it()
         return;
     }
     mlfw_mat_double_fill(history,0,0,history_rows-1,history_columns-1,0.0);
+    graph_file=fopen("graph.csv","w");
     while (STOP_FLAG==0)
     {
         if(k==NO_OF_ITERATIONS) break;
@@ -190,6 +192,8 @@ void train_it()
         //printf("Sum of square error values: %lf\n", sum_of_squared_error_values);
         //printf("Final_error_value: %lf\n", final_error_value);
         printf("Iteration Number: %" PRIu64",Error: %41.15lf\n",k,final_error_value);
+
+        fprintf(graph_file,"%" PRIu64 ",%lf\n",k,final_error_value);
 
         iteration_no=(double)k;
         //logic to add history starts here
@@ -277,6 +281,7 @@ void train_it()
         mlfw_column_vector_double_destroy(ETE);
         mlfw_column_vector_double_destroy(TMP);
     }
+    fclose(graph_file);
     mlfw_mat_double_to_csv(history,HISTORY_FILE_NAME);
     mlfw_column_vector_double_destroy(A);
     mlfw_column_vector_double_destroy(m);
