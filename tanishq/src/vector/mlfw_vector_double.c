@@ -70,7 +70,12 @@ dimension_t mlfw_column_vector_double_get_size(mlfw_column_vector_double *vector
     if(vector==NULL) return 0;
     return vector->size;
 }
-
+double mlfw_column_vector_double_mean(mlfw_column_vector_double *vector)
+{
+    double sum=0.0;
+    for(index_t i=0;i<vector->size;i++) sum+=vector->data[i];
+    return sum/(double)vector->size;
+}
 
 
 
@@ -130,4 +135,11 @@ dimension_t mlfw_row_vector_double_get_size(mlfw_row_vector_double *vector)
 {
     if(vector==NULL) return 0;
     return vector->size;
+}
+
+double mlfw_row_vector_double_mean(mlfw_row_vector_double *vector)
+{
+    double sum=0.0;
+    for(index_t i=0;i<vector->size;i++) sum+=vector->data[i];
+    return sum/(double)vector->size;
 }
