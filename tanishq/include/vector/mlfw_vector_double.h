@@ -14,6 +14,8 @@ void mlfw_column_vector_double_set(mlfw_column_vector_double *vector,index_t ind
 mlfw_column_vector_double * mlfw_column_vector_create_new_filled(dimension_t size,double value);
 mlfw_row_vector_double * mlfw_column_vector_double_transpose(mlfw_column_vector_double *vector);
 dimension_t mlfw_column_vector_double_get_size(mlfw_column_vector_double *vector);
+double mlfw_column_vector_double_mean(mlfw_column_vector_double *vector);
+
 
 //Row vector functions
 mlfw_row_vector_double * mlfw_row_vector_double_create_new(dimension_t size);
@@ -23,4 +25,6 @@ void mlfw_row_vector_double_set(mlfw_row_vector_double *vector,index_t index,dou
 mlfw_row_vector_double * mlfw_row_vector_create_new_filled(dimension_t size,double value);
 mlfw_column_vector_double * mlfw_row_vector_double_transpose(mlfw_row_vector_double *vector);
 dimension_t mlfw_row_vector_double_get_size(mlfw_row_vector_double *vector);
+double mlfw_row_vector_double_mean(mlfw_row_vector_double *vector);
+
 #endif
