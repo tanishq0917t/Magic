@@ -18,3 +18,5 @@ Usage: [create_test_train_dataset dataset test_file train_file minor_percentage]
   <li><b>train_file</b> - Training Dataset File name to be created</li>
   <li><b>minor_percentage</b> - Minor Percentage (% record to be stored in Testing Dataset)</li>
 </ul>
+ 
+##### Method used for Measuring quality of Regression Model - R2Score
