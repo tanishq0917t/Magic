@@ -1,6 +1,7 @@
 #include<mlfw_matrix.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include<string.h>
 typedef struct __mlfw_mat_string
 {
     char ***data;
@@ -54,80 +55,108 @@ void mlfw_mat_string_destroy(mlfw_mat_string *matrix)
     free(matrix->data);
     free(matrix);
 }
-// mlfw_mat_string * mlfw_mat_string_from_csv(const char *csv_file_name)
-// {
-//     FILE *file; //to open file
-//     if(csv_file_name==NULL) return NULL;
-//     file=fopen(csv_file_name,"r");
-//     if(!file) return NULL;
-//     mlfw_mat_string *matrix; //to create new matrix
-//     char m; //to reach each character of file
-//     dimension_t rows=0,columns=0;
-//     while(1) //counting number of rows and columns
-//     {
-//         m=fgetc(file);
-//         if(feof(file)) break;
-//         if(rows==0 && m==',') columns++;
-//         if(m=='\n') rows++;
-//     }
-//     columns++; // a,b,c means 2 commas and 2+1 columns
-//     matrix=mlfw_mat_string_create_new(rows,columns);
-//     if(matrix==NULL)
-//     {
-//         fclose(file);
-//         return NULL;
-//     }
-//     rewind(file); //move the internal pointer to first byte of file
-//     index_t r=0,c=0;
-//     char double_string[1025];
-//     int index=0;
-//     double value;
-//     while(1) //populating matrix
-//     {
-//         m=fgetc(file);
-//         if(feof(file)) break;
-//         if(m==',' || m=='\n')
-//         {
-//             double_string[index]='\0';
-//             value=strtod(double_string,NULL);
-//             index=0;
-//             matrix->data[r][c]=value;
-//             c++;
-//             if(c==matrix->columns)
-//             {
-//                 r++;
-//                 c=0;
-//             }
-//         }
-//         else
-//         {
-//             double_string[index]=m;
-//             index++;
-//         }
-//     }
-//     fclose(file);
-//     return matrix;
-// }
+mlfw_mat_string * mlfw_mat_string_from_csv(const char *csv_file_name)
+{
+    FILE *file; //to open file
+    if(csv_file_name==NULL) return NULL;
+    file=fopen(csv_file_name,"r");
+    if(!file) return NULL;
+    mlfw_mat_string *matrix; //to create new matrix
+    char m; //to reach each character of file
+    dimension_t rows=0,columns=0;
+    index_t r=0,c=0;
+    char string[5001];
+    int index=0;
+    while(1) //counting number of rows and columns
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(rows==0 && m==',') columns++;
+        if(m=='\n') rows++;
+    }
+    columns++; // a,b,c means 2 commas and 2+1 columns
+    // printf("Rows: %" PRIu32 " Columns: %" PRIu32" \n",rows,columns);
+    matrix=mlfw_mat_string_create_new(rows,columns);
+    if(matrix==NULL)
+    {
+        fclose(file);
+        return NULL;
+    }
+    rewind(file); //move the internal pointer to first byte of file
+    
+    while(1) //populating matrix
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m==',' || m=='\n')
+        {
+            string[index]='\0';
+            index=0;
+            matrix->data[r][c]=(char *)malloc(sizeof(char)*strlen(string)+1);
+            if(matrix->data[r][c])
+            {
+                strcpy(matrix->data[r][c],string);
+            }
+            c++;
+            if(c==matrix->columns)
+            {
+                r++;
+                c=0;
+            }
+        }
+        else
+        {
+            string[index]=m;
+            index++;
+        }
+    }
+    fclose(file);
+    return matrix;
+}
 
-// double mlfw_mat_string_get(mlfw_mat_string *matrix,index_t row,index_t column)
-// {
-//     double value=0.0;
-//     if(matrix==NULL) return value;
-//     if(row<0 && row>=matrix->rows) return value;
-//     if(column<0 && row>=matrix->columns) return value;
-//     return matrix->data[row][column];
-// }
-// void mlfw_mat_string_set(mlfw_mat_string *matrix,index_t row,index_t column,double value)
-// {
-//     if(matrix==NULL) return;
-//     if(row<0 && row>=matrix->rows) return;
-//     if(column<0 && row>=matrix->columns) return;
-//     matrix->data[row][column]=value;
-// }
+void mlfw_mat_string_get(mlfw_mat_string *matrix,index_t row,index_t column,char **string)
+{
+    if(string==NULL) return;
+    if(matrix==NULL)
+    {
+        *string=NULL;
+        return;
+    }
+    if(row<0 && row>=matrix->rows)
+    if(matrix==NULL)
+    {
+        *string=NULL;
+        return;
+    }
+    if(column<0 && row>=matrix->columns)
+    if(matrix==NULL)
+    {
+        *string=NULL;
+        return;
+    }
+    if(matrix->data[row][column]==NULL) 
+    {
+        *string=NULL;
+        return;
+    }
+    *string=(char *)malloc(sizeof(char)*strlen(matrix->data[row][column])+1);
+    if(*string==NULL) return;
+    strcpy(*string,matrix->data[row][column]);
+}
+void mlfw_mat_string_set(mlfw_mat_string *matrix,index_t row,index_t column,char * string)
+{
+    if(matrix==NULL) return;
+    if(row<0 && row>=matrix->rows) return;
+    if(column<0 && row>=matrix->columns) return;
+    //re-writing a cell
+    if(matrix->data[row][column]!=NULL) free(matrix->data[row][column]);
+    matrix->data[row][column]=(char *)malloc(sizeof(char)*(strlen(string)+1));
+    if(matrix->data[row][column]!=NULL) strcpy(matrix->data[row][column],string);
+}
 
-// void mlfw_mat_string_get_dimension(mlfw_mat_string *matrix,dimension_t *rows,dimension_t *columns)
-// {
-//     if(matrix==NULL) return;
-//     if(rows) *rows=matrix->rows;
-//     if(columns) *columns=matrix->columns;
-// }
+void mlfw_mat_string_get_dimension(mlfw_mat_string *matrix,dimension_t *rows,dimension_t *columns)
+{
+    if(matrix==NULL) return;
+    if(rows) *rows=matrix->rows;
+    if(columns) *columns=matrix->columns;
+}
