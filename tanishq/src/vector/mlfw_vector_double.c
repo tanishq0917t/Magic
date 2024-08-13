@@ -76,7 +76,70 @@ double mlfw_column_vector_double_mean(mlfw_column_vector_double *vector)
     for(index_t i=0;i<vector->size;i++) sum+=vector->data[i];
     return sum/(double)vector->size;
 }
+void mlfw_column_vector_double_to_csv(mlfw_column_vector_double *vector,char *CSV_FILE_NAME)
+{
+    FILE *file;
+    if(vector==NULL || CSV_FILE_NAME==NULL) return;
+    file=fopen(CSV_FILE_NAME,"w");
+    if(file==NULL) return;
+    for(index_t i=0;i<vector->size;i++)
+    {
+        fprintf(file,"%lf",vector->data[i]);
+        if(i==vector->size-1) fputc('\n',file);
+        else fputc(',',file);
+    }
+    fclose(file);
+}
+mlfw_column_vector_double * mlfw_column_vector_double_from_csv(char *CSV_FILE_NAME)
+{
+    if(CSV_FILE_NAME==NULL) return NULL;
+    mlfw_column_vector_double *vector;
+    FILE *file;
+    dimension_t size;
+    char m,doubleString[1025];
+    index_t i,j;
+    double value;
 
+    file=fopen(CSV_FILE_NAME,"r");
+    if(file==NULL) return NULL;
+    size=0;
+    while(1)
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m==',') size++;
+    }
+    size++;
+    vector=mlfw_column_vector_double_create_new(size);
+    if(vector==NULL)
+    {
+        fclose(file);
+        return NULL;
+    }
+    rewind(file);
+    i=0;
+    j=0;
+    while(1)
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m==',' || m=='\n')
+        {
+            doubleString[i]='\0';
+            value=strtod(doubleString,NULL);
+            mlfw_column_vector_double_set(vector,j,value);
+            i=0;
+            j++;
+        }
+        else
+        {
+            doubleString[i]=m;
+            i++;
+        }
+    }
+    fclose(file);
+    return vector;
+}
 
 
 //Row vector functions
@@ -142,4 +205,68 @@ double mlfw_row_vector_double_mean(mlfw_row_vector_double *vector)
     double sum=0.0;
     for(index_t i=0;i<vector->size;i++) sum+=vector->data[i];
     return sum/(double)vector->size;
+}
+void mlfw_row_vector_double_to_csv(mlfw_row_vector_double *vector,char *CSV_FILE_NAME)
+{
+    FILE *file;
+    if(vector==NULL || CSV_FILE_NAME==NULL) return;
+    file=fopen(CSV_FILE_NAME,"w");
+    if(file==NULL) return;
+    for(index_t i=0;i<vector->size;i++)
+    {
+        fprintf(file,"%lf",vector->data[i]);
+        if(i==vector->size-1) fputc('\n',file);
+        else fputc(',',file);
+    }
+    fclose(file);
+}
+mlfw_row_vector_double * mlfw_row_vector_double_from_csv(char *CSV_FILE_NAME)
+{
+    if(CSV_FILE_NAME==NULL) return NULL;
+    mlfw_row_vector_double *vector;
+    FILE *file;
+    dimension_t size;
+    char m,doubleString[1025];
+    index_t i,j;
+    double value;
+
+    file=fopen(CSV_FILE_NAME,"r");
+    if(file==NULL) return NULL;
+    size=0;
+    while(1)
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m==',') size++;
+    }
+    size++;
+    vector=mlfw_row_vector_double_create_new(size);
+    if(vector==NULL)
+    {
+        fclose(file);
+        return NULL;
+    }
+    rewind(file);
+    i=0;
+    j=0;
+    while(1)
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m==',' || m=='\n')
+        {
+            doubleString[i]='\0';
+            value=strtod(doubleString,NULL);
+            mlfw_row_vector_double_set(vector,j,value);
+            i=0;
+            j++;
+        }
+        else
+        {
+            doubleString[i]=m;
+            i++;
+        }
+    }
+    fclose(file);
+    return vector;
 }
