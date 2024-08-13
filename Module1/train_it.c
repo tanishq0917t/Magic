@@ -11,6 +11,8 @@ char * DATASET_FILE_NAME=NULL;
 double LEARNING_RATE=1.0;
 dimension_t HISTORY_SIZE=0;
 char *HISTORY_FILE_NAME=NULL;
+char *PARAMETERS_FILE_NAME=NULL;
+char *GRAPH_FILE_NAME=NULL;
 uint8_t STOP_FLAG=0;
 
 void train_it()
@@ -66,7 +68,7 @@ void train_it()
         7th Arg : source_to_row_index
         8th Arg : source_to_column_index
     */
-    mlfw_mat_double_copy(I, dataset, 0, 1, 0, 0, dataset_rows - 1, 0);
+    mlfw_mat_double_copy(I, dataset, 0, 1, 0, 0, dataset_rows - 1, dataset_columns-2);
 
     /*
         1st Arg : matrix to fill
@@ -89,7 +91,7 @@ void train_it()
         1st Arg: source matrix
         2nd Arg: which column to use to create column vector
     */
-    A = mlfw_mat_double_create_column_vec(dataset, 1);
+    A = mlfw_mat_double_create_column_vec(dataset, dataset_columns-1);
     if (A == NULL)
     {
         printf("Unable to create column vector");
@@ -123,7 +125,7 @@ void train_it()
         return;
     }
     mlfw_mat_double_fill(history,0,0,history_rows-1,history_columns-1,0.0);
-    graph_file=fopen("graph.csv","w");
+    graph_file=fopen(GRAPH_FILE_NAME,"w");
     while (STOP_FLAG==0)
     {
         if(k==NO_OF_ITERATIONS) break;
@@ -282,7 +284,10 @@ void train_it()
         mlfw_column_vector_double_destroy(TMP);
     }
     fclose(graph_file);
+
     mlfw_mat_double_to_csv(history,HISTORY_FILE_NAME);
+    mlfw_column_vector_double_to_csv(m,PARAMETERS_FILE_NAME);
+
     mlfw_column_vector_double_destroy(A);
     mlfw_column_vector_double_destroy(m);
     // mlfw_column_vector_double_destroy(P);
@@ -306,9 +311,9 @@ int main(int argc,char *argv[])
     char m;
     int result;
 
-    if(argc!=5 && argc!=6)
+    if(argc!=7 && argc!=8)
     {
-        printf("Usage: train.out dataset_name learning_rate history_size history_file_name no_of_iterations(optional)\n");
+        printf("Usage: train.out dataset_name learning_rate history_size history_file_name PARAMETER_FILE GRAPH_FILE no_of_iterations(optional)\n");
         return 0;
     }
     char *ptr=NULL;
@@ -316,16 +321,18 @@ int main(int argc,char *argv[])
     LEARNING_RATE=strtod(argv[2],&ptr);
     ptr=NULL;
     HISTORY_SIZE=(dimension_t)strtoull(argv[3],&ptr,10);
-    if(HISTORY_SIZE<=0)
+    if(HISTORY_SIZE<10)
     {
         printf("History Size be greater than 10\n");
         return 0;
     }
     HISTORY_FILE_NAME=argv[4];
-    if(argc==6)
+    PARAMETERS_FILE_NAME=argv[5];
+    GRAPH_FILE_NAME=argv[6];
+    if(argc==8)
     {
         ptr=NULL;
-        NO_OF_ITERATIONS=strtoull(argv[5],&ptr,10);
+        NO_OF_ITERATIONS=strtoull(argv[7],&ptr,10);
     }
     result=pthread_create(&thread_id,NULL,thread_function,NULL);
     if(result!=0)
