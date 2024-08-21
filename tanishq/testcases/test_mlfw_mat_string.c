@@ -27,6 +27,7 @@ int main()
         }
         printf("\n");
     }
+    mlfw_mat_string_to_csv(matrix,"hello.csv");
     mlfw_mat_string_destroy(matrix);
     return 0;
 }

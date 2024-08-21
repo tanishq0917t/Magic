@@ -8,4 +8,5 @@
 #endif
 
 #include <vector/mlfw_vector_double.h>
+#include <vector/mlfw_vector_string.h>
 #endif

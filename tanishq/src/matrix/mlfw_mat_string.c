@@ -160,3 +160,21 @@ void mlfw_mat_string_get_dimension(mlfw_mat_string *matrix,dimension_t *rows,dim
     if(rows) *rows=matrix->rows;
     if(columns) *columns=matrix->columns;
 }
+
+void mlfw_mat_string_to_csv(mlfw_mat_string *matrix,const char *csv_file_name)
+{
+    if(matrix==NULL || csv_file_name==NULL) return;
+    FILE *file;
+    file=fopen(csv_file_name,"w");
+    if(file==NULL) return;
+    for(index_t r=0;r<matrix->rows;r++)
+    {
+        for(index_t c=0;c<matrix->columns;c++)
+        {
+            fputs(matrix->data[r][c],file);
+            if(c<matrix->columns-1) fputc(',',file);
+            else fputc('\n',file);
+        }
+    }
+    fclose(file);
+}
