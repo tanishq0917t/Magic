@@ -264,3 +264,45 @@ mlfw_mat_double * mlfw_mat_double_transpose(mlfw_mat_double *matrix)
     }
     return matrix_t;
 }
+double mlfw_mat_double_get_min(mlfw_mat_double *matrix,index_t start_r,index_t start_c,index_t end_r,index_t end_c)
+{
+    double minimum;
+    index_t r, c;
+    if (matrix==NULL) return 0.0;
+    if(start_r<0) start_r=0;
+    if(start_c<0) start_c=0;
+    if (end_r>=matrix->rows) end_r=matrix->rows-1;
+    if (end_c>=matrix->columns) end_c=matrix->columns-1;
+    if (start_r>end_r) return 0.0;
+    if (start_c>end_c) return 0.0;
+    minimum=matrix->data[start_r][start_c];
+    for(r=start_r;r<=end_r;r++)
+    {
+        for(c=start_c;c<=end_c;c++)
+        {
+            if(matrix->data[r][c]<minimum) minimum=matrix->data[r][c];
+        }
+    }
+    return minimum;
+}
+double mlfw_mat_double_get_max(mlfw_mat_double *matrix,index_t start_r,index_t start_c,index_t end_r,index_t end_c)
+{
+    double maximum;
+    index_t r, c;
+    if (matrix==NULL) return 0.0;
+    if(start_r<0) start_r=0;
+    if(start_c<0) start_c=0;
+    if (end_r>=matrix->rows) end_r=matrix->rows-1;
+    if (end_c>=matrix->columns) end_c=matrix->columns-1;
+    if (start_r>end_r) return 0.0;
+    if (start_c>end_c) return 0.0;
+    maximum=matrix->data[start_r][start_c];
+    for(r=start_r;r<=end_r;r++)
+    {
+        for(c=start_c;c<=end_c;c++)
+        {
+            if(matrix->data[r][c]>maximum) maximum=matrix->data[r][c];
+        }
+    }
+    return maximum;
+}
