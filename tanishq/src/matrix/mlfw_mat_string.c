@@ -171,7 +171,7 @@ void mlfw_mat_string_to_csv(mlfw_mat_string *matrix,const char *csv_file_name)
     {
         for(index_t c=0;c<matrix->columns;c++)
         {
-            fputs(matrix->data[r][c],file);
+            if(matrix->data[r][c]!=NULL) fputs(matrix->data[r][c],file);
             if(c<matrix->columns-1) fputc(',',file);
             else fputc('\n',file);
         }
