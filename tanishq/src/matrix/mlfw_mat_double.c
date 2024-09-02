@@ -44,13 +44,12 @@ void mlfw_mat_double_destroy(mlfw_mat_double *matrix)
     free(matrix->data);
     free(matrix);
 }
-mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name)
+mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name,mlfw_mat_double *matrix)
 {
     FILE *file; //to open file
     if(csv_file_name==NULL) return NULL;
     file=fopen(csv_file_name,"r");
     if(!file) return NULL;
-    mlfw_mat_double *matrix; //to create new matrix
     char m; //to reach each character of file
     dimension_t rows=0,columns=0;
     while(1) //counting number of rows and columns
@@ -61,11 +60,18 @@ mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name)
         if(m=='\n') rows++;
     }
     columns++; // a,b,c means 2 commas and 2+1 columns
-    matrix=mlfw_mat_double_create_new(rows,columns);
     if(matrix==NULL)
     {
-        fclose(file);
-        return NULL;
+        matrix=mlfw_mat_double_create_new(rows,columns);
+        if(matrix==NULL)
+        {
+            fclose(file);
+            return NULL;
+        }
+    }
+    else
+    {
+        if(matrix->rows!=rows || matrix->columns!=columns) return NULL;
     }
     rewind(file); //move the internal pointer to first byte of file
     index_t r=0,c=0;
@@ -173,13 +179,19 @@ void mlfw_mat_double_fill(mlfw_mat_double *matrix,index_t from_row_index,index_t
     }
 }
 
-mlfw_column_vector_double * mlfw_mat_double_create_column_vec(mlfw_mat_double * matrix,index_t index)
+mlfw_column_vector_double * mlfw_mat_double_create_column_vec(mlfw_mat_double * matrix,index_t index,mlfw_column_vector_double *vector)
 {
     if(matrix==NULL) return NULL;
     if(index<0 || index>=matrix->columns) return NULL;
-    mlfw_column_vector_double *vector;
-    vector=mlfw_column_vector_double_create_new(matrix->rows);
-    if(vector==NULL) return NULL;
+    if(vector==NULL)
+    {
+        vector=mlfw_column_vector_double_create_new(matrix->rows);
+        if(vector==NULL) return NULL;
+    }
+    else
+    {
+        if(mlfw_column_vector_double_get_size(vector)!=matrix->rows) return NULL;
+    }
     for(index_t r=0;r<matrix->rows;r++)
     {
         mlfw_column_vector_double_set(vector,r,matrix->data[r][index]);
@@ -187,13 +199,19 @@ mlfw_column_vector_double * mlfw_mat_double_create_column_vec(mlfw_mat_double * 
     return vector;
 }
 
-mlfw_mat_double * mlfw_mat_double_shuffle(mlfw_mat_double *matrix,uint8_t shuffle_count)
+mlfw_mat_double * mlfw_mat_double_shuffle(mlfw_mat_double *matrix,uint8_t shuffle_count,mlfw_mat_double *shuffled_matrix)
 {
     if(matrix==NULL) return NULL;
     if(shuffle_count==0) return NULL;
-    mlfw_mat_double *shuffled_matrix;
-    shuffled_matrix=mlfw_mat_double_create_new(matrix->rows,matrix->columns);
-    if(shuffled_matrix==NULL) return NULL;
+    if(shuffled_matrix==NULL)
+    {
+        shuffled_matrix=mlfw_mat_double_create_new(matrix->rows,matrix->columns);
+        if(shuffled_matrix==NULL) return NULL;
+    }
+    else
+    {
+        if(shuffled_matrix->rows!=matrix->rows || shuffled_matrix->columns!=matrix->columns) return NULL;
+    }
     mlfw_mat_double_copy(shuffled_matrix,matrix,0,0,0,0,matrix->rows-1,matrix->columns-1);
 
     // for(index_t r=0;r<shuffled_matrix->rows;r++)
@@ -249,20 +267,26 @@ void mlfw_mat_double_to_csv(mlfw_mat_double *matrix,char *csv_file_name)
     fclose(file);
 }
 
-mlfw_mat_double * mlfw_mat_double_transpose(mlfw_mat_double *matrix)
+mlfw_mat_double * mlfw_mat_double_transpose(mlfw_mat_double *matrix,mlfw_mat_double *transposed_matrix)
 {
     if(matrix==NULL) return NULL;
-    mlfw_mat_double * matrix_t;
-    matrix_t=mlfw_mat_double_create_new(matrix->columns,matrix->rows);
-    if(matrix_t==NULL) return NULL;
+    if(transposed_matrix==NULL)
+    {
+        transposed_matrix=mlfw_mat_double_create_new(matrix->columns,matrix->rows);
+        if(transposed_matrix==NULL) return NULL;
+    }
+    else
+    {
+        if(transposed_matrix->columns!=matrix->rows || transposed_matrix->rows!=matrix->columns) return NULL;
+    }
     for(index_t r=0;r<matrix->rows;r++)
     {
         for(index_t c=0;c<matrix->columns;c++)
         {
-            matrix_t->data[c][r]=matrix->data[r][c];
+            transposed_matrix->data[c][r]=matrix->data[r][c];
         }
     }
-    return matrix_t;
+    return transposed_matrix;
 }
 double mlfw_mat_double_get_min(mlfw_mat_double *matrix,index_t start_r,index_t start_c,index_t end_r,index_t end_c)
 {
