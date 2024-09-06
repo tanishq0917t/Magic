@@ -16,7 +16,7 @@ void mlfw_encoder_encode_one_hot(char *source, char *target, int *encode_columns
     char *string, *set_string;
     dimension_t set_size;
 
-    matrix = mlfw_mat_string_from_csv(source);
+    matrix = mlfw_mat_string_from_csv(source,NULL);
     mlfw_mat_string_get_dimension(matrix, &matrix_rows, &matrix_columns);
     for (i = 0; i < size; i++)
     {

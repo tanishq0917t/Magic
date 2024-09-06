@@ -55,13 +55,12 @@ void mlfw_mat_string_destroy(mlfw_mat_string *matrix)
     free(matrix->data);
     free(matrix);
 }
-mlfw_mat_string * mlfw_mat_string_from_csv(const char *csv_file_name)
+mlfw_mat_string * mlfw_mat_string_from_csv(const char *csv_file_name, mlfw_mat_string *matrix)
 {
     FILE *file; //to open file
     if(csv_file_name==NULL) return NULL;
     file=fopen(csv_file_name,"r");
     if(!file) return NULL;
-    mlfw_mat_string *matrix; //to create new matrix
     char m; //to reach each character of file
     dimension_t rows=0,columns=0;
     index_t r=0,c=0;
@@ -76,11 +75,18 @@ mlfw_mat_string * mlfw_mat_string_from_csv(const char *csv_file_name)
     }
     columns++; // a,b,c means 2 commas and 2+1 columns
     // printf("Rows: %" PRIu32 " Columns: %" PRIu32" \n",rows,columns);
-    matrix=mlfw_mat_string_create_new(rows,columns);
     if(matrix==NULL)
     {
-        fclose(file);
-        return NULL;
+        matrix=mlfw_mat_string_create_new(rows,columns);
+        if(matrix==NULL)
+        {
+            fclose(file);
+            return NULL;
+        }
+    }
+    else
+    {
+        if(matrix->rows!=rows || matrix->columns!=columns) return NULL;
     }
     rewind(file); //move the internal pointer to first byte of file
     
