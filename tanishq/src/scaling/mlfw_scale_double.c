@@ -3,13 +3,12 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-mlfw_mat_double *mlfw_scale_double_min_max(mlfw_mat_double *matrix,index_t start_r,index_t start_c,index_t end_r,index_t end_c,char *min_max_file)
+mlfw_mat_double *mlfw_scale_double_min_max(mlfw_mat_double *matrix,index_t start_r,index_t start_c,index_t end_r,index_t end_c,char *min_max_file,mlfw_mat_double *new_matrix)
 {
     if(matrix==NULL) return NULL;
     FILE *file;
     dimension_t matrix_rows,matrix_columns;
     dimension_t new_matrix_rows,new_matrix_columns;
-    mlfw_mat_double *new_matrix;
     mlfw_mat_double_get_dimension(matrix,&matrix_rows,&matrix_columns);
     double value,scaled_value;
 
@@ -21,8 +20,18 @@ mlfw_mat_double *mlfw_scale_double_min_max(mlfw_mat_double *matrix,index_t start
     if (start_c>end_c) return NULL;
     new_matrix_columns=end_c-start_c+1;
     new_matrix_rows=end_r-start_r+1;
-    new_matrix=mlfw_mat_double_create_new(new_matrix_rows,new_matrix_columns);
-    if(new_matrix==NULL) return NULL;
+
+    if(new_matrix==NULL)
+    {
+        new_matrix=mlfw_mat_double_create_new(new_matrix_rows,new_matrix_columns);
+        if(new_matrix==NULL) return NULL;
+    }
+    else
+    {
+        dimension_t nmr,nmc;
+        mlfw_mat_double_get_dimension(new_matrix,&nmr,&nmc);
+        if(nmr!=new_matrix_rows || nmc!=new_matrix_columns) return NULL;
+    }
     double *min,*max;
     max=(double *)malloc(sizeof(double)*new_matrix_columns);
     if(max==NULL) return NULL;
@@ -74,13 +83,12 @@ mlfw_mat_double *mlfw_scale_double_min_max(mlfw_mat_double *matrix,index_t start
 
 
 
-mlfw_mat_double *mlfw_scale_double_min_max_with_given_file(mlfw_mat_double *matrix,index_t start_r,index_t start_c,index_t end_r,index_t end_c,mlfw_mat_double *min_max_matrix)
+mlfw_mat_double *mlfw_scale_double_min_max_with_given_file(mlfw_mat_double *matrix,index_t start_r,index_t start_c,index_t end_r,index_t end_c,mlfw_mat_double *min_max_matrix,mlfw_mat_double *new_matrix)
 {
     if(matrix==NULL || min_max_matrix==NULL) return NULL;
     dimension_t matrix_rows,matrix_columns;
     dimension_t new_matrix_rows,new_matrix_columns;
     dimension_t min_max_rows,min_max_columns;
-    mlfw_mat_double *new_matrix;
     mlfw_mat_double_get_dimension(matrix,&matrix_rows,&matrix_columns);
     mlfw_mat_double_get_dimension(min_max_matrix,&min_max_rows,&min_max_columns);
     if(min_max_rows!=2) return NULL;
@@ -96,8 +104,17 @@ mlfw_mat_double *mlfw_scale_double_min_max_with_given_file(mlfw_mat_double *matr
     new_matrix_columns=end_c-start_c+1;
     if(min_max_columns!=new_matrix_columns) return NULL;
     new_matrix_rows=end_r-start_r+1;
-    new_matrix=mlfw_mat_double_create_new(new_matrix_rows,new_matrix_columns);
-    if(new_matrix==NULL) return NULL;
+    if(new_matrix==NULL)
+    {
+        new_matrix=mlfw_mat_double_create_new(new_matrix_rows,new_matrix_columns);
+        if(new_matrix==NULL) return NULL;
+    }
+    else
+    {
+        dimension_t nmr,nmc;
+        mlfw_mat_double_get_dimension(new_matrix,&nmr,&nmc);
+        if(nmr!=new_matrix_rows || nmc!=new_matrix_columns) return NULL;   
+    }
     
     for(index_t r=start_r,new_r=0;new_r<new_matrix_rows;new_r++,r++)
     {
