@@ -47,21 +47,33 @@ void mlfw_column_vector_double_set(mlfw_column_vector_double *vector,index_t ind
     if(index<0 || index>=vector->size) return;
     vector->data[index]=value;
 }
-mlfw_column_vector_double * mlfw_column_vector_create_new_filled(dimension_t size,double value)
+mlfw_column_vector_double * mlfw_column_vector_create_new_filled(dimension_t size,double value,mlfw_column_vector_double *vector)
 {
     if(size<=0) return NULL;
-    mlfw_column_vector_double *vector;
-    vector=mlfw_column_vector_double_create_new(size);
-    if(vector==NULL) return NULL;
+    if(vector==NULL)
+    {
+        vector=mlfw_column_vector_double_create_new(size);
+        if(vector==NULL) return NULL;
+    }
+    else
+    {
+        if(vector->size!=size) return NULL;
+    }
     for(index_t i=0;i<size;i++) vector->data[i]=value;
     return vector;
 }
-mlfw_row_vector_double * mlfw_column_vector_double_transpose(mlfw_column_vector_double *vector)
+mlfw_row_vector_double * mlfw_column_vector_double_transpose(mlfw_column_vector_double *vector,mlfw_row_vector_double *transposed_vector)
 {
     if(vector==NULL) return NULL;
-    mlfw_row_vector_double *transposed_vector;
-    transposed_vector=mlfw_row_vector_double_create_new(vector->size);
-    if(transposed_vector==NULL) return NULL;
+    if(transposed_vector==NULL)
+    {
+        transposed_vector=mlfw_row_vector_double_create_new(vector->size);
+        if(transposed_vector==NULL) return NULL;
+    }
+    else
+    {
+        if(transposed_vector->size!=vector->size) return NULL;
+    }
     for(index_t i=0;i<vector->size;i++) transposed_vector->data[i]=vector->data[i];
     return transposed_vector;
 }
@@ -90,10 +102,9 @@ void mlfw_column_vector_double_to_csv(mlfw_column_vector_double *vector,char *CS
     }
     fclose(file);
 }
-mlfw_column_vector_double * mlfw_column_vector_double_from_csv(char *CSV_FILE_NAME)
+mlfw_column_vector_double * mlfw_column_vector_double_from_csv(char *CSV_FILE_NAME,mlfw_column_vector_double *vector)
 {
     if(CSV_FILE_NAME==NULL) return NULL;
-    mlfw_column_vector_double *vector;
     FILE *file;
     dimension_t size;
     char m,doubleString[1025];
@@ -110,11 +121,18 @@ mlfw_column_vector_double * mlfw_column_vector_double_from_csv(char *CSV_FILE_NA
         if(m==',') size++;
     }
     size++;
-    vector=mlfw_column_vector_double_create_new(size);
     if(vector==NULL)
     {
-        fclose(file);
-        return NULL;
+        vector=mlfw_column_vector_double_create_new(size);
+        if(vector==NULL)
+        {
+            fclose(file);
+            return NULL;
+        }
+    }
+    else
+    {
+        if(vector->size!=size) return NULL;
     }
     rewind(file);
     i=0;
@@ -176,21 +194,33 @@ void mlfw_row_vector_double_set(mlfw_row_vector_double *vector,index_t index,dou
     if(index<0 || index>=vector->size) return;
     vector->data[index]=value;
 }
-mlfw_row_vector_double * mlfw_row_vector_create_new_filled(dimension_t size,double value)
+mlfw_row_vector_double * mlfw_row_vector_create_new_filled(dimension_t size,double value,mlfw_row_vector_double *vector)
 {
     if(size<=0) return NULL;
-    mlfw_row_vector_double *vector;
-    vector=mlfw_row_vector_double_create_new(size);
-    if(vector==NULL) return NULL;
+    if(vector==NULL)
+    {
+        vector=mlfw_row_vector_double_create_new(size);
+        if(vector==NULL) return NULL;
+    }
+    else
+    {
+        if(vector->size!=size) return NULL;
+    }
     for(index_t i=0;i<size;i++) vector->data[i]=value;
     return vector;
 }
-mlfw_column_vector_double * mlfw_row_vector_double_transpose(mlfw_row_vector_double *vector)
+mlfw_column_vector_double * mlfw_row_vector_double_transpose(mlfw_row_vector_double *vector,mlfw_column_vector_double *transposed_vector)
 {
     if(vector==NULL) return NULL;
-    mlfw_column_vector_double *transposed_vector;
-    transposed_vector=mlfw_column_vector_double_create_new(vector->size);
-    if(transposed_vector==NULL) return NULL;
+    if(transposed_vector==NULL)
+    {
+        transposed_vector=mlfw_column_vector_double_create_new(vector->size);
+        if(transposed_vector==NULL) return NULL;
+    }
+    else
+    {
+        if(transposed_vector->size!=vector->size) return NULL;
+    }
     for(index_t i=0;i<vector->size;i++) transposed_vector->data[i]=vector->data[i];
     return transposed_vector;
 }
@@ -220,10 +250,9 @@ void mlfw_row_vector_double_to_csv(mlfw_row_vector_double *vector,char *CSV_FILE
     }
     fclose(file);
 }
-mlfw_row_vector_double * mlfw_row_vector_double_from_csv(char *CSV_FILE_NAME)
+mlfw_row_vector_double * mlfw_row_vector_double_from_csv(char *CSV_FILE_NAME,mlfw_row_vector_double *vector)
 {
     if(CSV_FILE_NAME==NULL) return NULL;
-    mlfw_row_vector_double *vector;
     FILE *file;
     dimension_t size;
     char m,doubleString[1025];
@@ -240,11 +269,18 @@ mlfw_row_vector_double * mlfw_row_vector_double_from_csv(char *CSV_FILE_NAME)
         if(m==',') size++;
     }
     size++;
-    vector=mlfw_row_vector_double_create_new(size);
     if(vector==NULL)
     {
-        fclose(file);
-        return NULL;
+        vector=mlfw_row_vector_double_create_new(size);
+        if(vector==NULL)
+        {
+            fclose(file);
+            return NULL;
+        }
+    }
+    else
+    {
+        if(vector->size!=size) return NULL;
     }
     rewind(file);
     i=0;
