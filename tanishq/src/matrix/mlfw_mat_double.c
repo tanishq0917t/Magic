@@ -44,14 +44,61 @@ void mlfw_mat_double_destroy(mlfw_mat_double *matrix)
     free(matrix->data);
     free(matrix);
 }
-mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name,mlfw_mat_double *matrix)
+mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name,mlfw_mat_double *matrix,mlfw_row_vec_string **header)
 {
+    char header_string[1025];
+    index_t header_index;
+    dimension_t rows=0,columns=0;
+    index_t r=0,c=0;
+    char double_string[1025];
+    int index=0;
+    double value;
+    char m; //to reach each character of file
     FILE *file; //to open file
     if(csv_file_name==NULL) return NULL;
     file=fopen(csv_file_name,"r");
     if(!file) return NULL;
-    char m; //to reach each character of file
-    dimension_t rows=0,columns=0;
+    //Logic to read first line starts here
+    columns=0;
+    while(1)
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m=='\r') continue;
+        if(m==',') columns++;
+        if(m=='\n') break;
+    }
+    columns++;
+    //Logic to read first line ends here
+    *header=mlfw_row_vec_string_create_new(columns);
+    if(*header==NULL) return NULL;
+    rewind(file);
+    index=0;
+    header_index=0;
+    while(1) //logic to prepare header
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m=='\r') continue;
+        if(m==',')
+        {
+            header_string[index]='\0';
+            mlfw_row_vec_string_set(*header,header_index,header_string);
+            header_index++;
+            index=0;
+            continue;
+        }
+        if(m=='\n')
+        {
+            header_string[index]='\0';
+            mlfw_row_vec_string_set(*header,header_index,header_string);
+            break;
+        }
+        header_string[index]=m;
+        index++;
+    }
+    rows=0;
+    columns=0;
     while(1) //counting number of rows and columns
     {
         m=fgetc(file);
@@ -66,22 +113,36 @@ mlfw_mat_double * mlfw_mat_double_from_csv(const char *csv_file_name,mlfw_mat_do
         if(matrix==NULL)
         {
             fclose(file);
+            mlfw_row_vec_string_destroy(*header);
+            header=NULL;
             return NULL;
         }
     }
     else
     {
-        if(matrix->rows!=rows || matrix->columns!=columns) return NULL;
+        if(matrix->rows!=rows || matrix->columns!=columns)
+        {
+            mlfw_row_vec_string_destroy(*header);
+            header=NULL;
+            return NULL;
+        }
     }
     rewind(file); //move the internal pointer to first byte of file
-    index_t r=0,c=0;
-    char double_string[1025];
-    int index=0;
-    double value;
+
+    //logic to skip the header
+    while(1)
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m=='\r') continue;
+        if(m=='\n') break;
+    }
+    index=0;
     while(1) //populating matrix
     {
         m=fgetc(file);
         if(feof(file)) break;
+        if(m=='\r') continue;
         if(m==',' || m=='\n')
         {
             double_string[index]='\0';
@@ -246,14 +307,31 @@ mlfw_mat_double * mlfw_mat_double_shuffle(mlfw_mat_double *matrix,uint8_t shuffl
     return shuffled_matrix;
 }
 
-void mlfw_mat_double_to_csv(mlfw_mat_double *matrix,char *csv_file_name)
+void mlfw_mat_double_to_csv(mlfw_mat_double *matrix,char *csv_file_name,mlfw_row_vec_string *header)
 {
+    dimension_t header_size;
     index_t r,c;
-    char separator;
+    char separator,*ptr;
     FILE *file;
     if(matrix==NULL || csv_file_name==NULL) return;
     file=fopen(csv_file_name,"w");
     if(file==NULL) return;
+    if(header==NULL) fputc('\n',file);
+    else
+    {
+        header_size=mlfw_row_vec_string_get_size(header);
+        for(index_t index=0;index<header_size;index++)
+        {
+            mlfw_row_vec_string_get(header,index,&ptr);
+            if(ptr!=NULL)
+            {
+                fputs(ptr,file);
+                free(ptr);
+            }
+            if(index<header_size-1) fputc(',',file);
+            else fputc('\n',file);
+        }
+    }
     for(r=0;r<matrix->rows;r++)
     {
         for(c=0;c<matrix->columns;c++)
