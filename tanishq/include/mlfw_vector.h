@@ -6,7 +6,7 @@
 #define dimension_t uint32_t
 #define index_t uint32_t
 #endif
-
-#include <vector/mlfw_vector_double.h>
 #include <vector/mlfw_vector_string.h>
+#include <vector/mlfw_vector_double.h>
+
 #endif

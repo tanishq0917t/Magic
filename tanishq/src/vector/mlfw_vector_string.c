@@ -41,9 +41,11 @@ void mlfw_row_vec_string_destroy(mlfw_row_vec_string *vector)
     free(vector->data);
     free(vector);
 }
-mlfw_row_vec_string *mlfw_row_vec_string_from_csv(const char *csv_file_name,mlfw_row_vec_string *vector)
+mlfw_row_vec_string *mlfw_row_vec_string_from_csv(const char *csv_file_name,mlfw_row_vec_string *vector,mlfw_row_vec_string **header)
 {
     if(csv_file_name==NULL) return NULL;
+    char header_string[1025];
+    index_t header_index;
     int index;
     index_t c;
     char m;
@@ -52,6 +54,7 @@ mlfw_row_vec_string *mlfw_row_vec_string_from_csv(const char *csv_file_name,mlfw
     dimension_t columns;
     file=fopen(csv_file_name,"r");
     if(file==NULL) return NULL;
+    
     columns=0;
     while(1)
     {
@@ -196,7 +199,7 @@ void mlfw_column_vec_string_destroy(mlfw_column_vec_string *vector)
     free(vector->data);
     free(vector);
 }
-mlfw_column_vec_string *mlfw_column_vec_string_from_csv(const char *csv_file_name,mlfw_column_vec_string *vector)
+mlfw_column_vec_string *mlfw_column_vec_string_from_csv(const char *csv_file_name,mlfw_column_vec_string *vector,mlfw_row_vec_string **header)
 {
     if(csv_file_name==NULL) return NULL;
     int index;
