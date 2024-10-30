@@ -44,8 +44,8 @@ void mlfw_row_vec_string_destroy(mlfw_row_vec_string *vector)
 mlfw_row_vec_string *mlfw_row_vec_string_from_csv(const char *csv_file_name,mlfw_row_vec_string *vector,mlfw_row_vec_string **header)
 {
     if(csv_file_name==NULL) return NULL;
-    char header_string[1025];
-    index_t header_index;
+    // char header_string[1025];
+    // index_t header_index;
     int index;
     index_t c;
     char m;
@@ -208,15 +208,50 @@ mlfw_column_vec_string *mlfw_column_vec_string_from_csv(const char *csv_file_nam
     char string[5001];
     FILE *file;
     dimension_t columns;
+    char header_string[1025];
+    index_t header_index;
     file=fopen(csv_file_name,"r");
     if(file==NULL) return NULL;
+    //header logic
     columns=0;
     while(1)
     {
         m=fgetc(file);
         if(feof(file)) break;
-        if(m==',' || m=='\n') columns++;
+        if(m=='\r') continue;
+        if(m==',') columns++;
+        if(m=='\n') break;
     }
+    columns++;
+    //Logic to read first line ends here
+    *header=mlfw_row_vec_string_create_new(columns);
+    if(*header==NULL) return NULL;
+    rewind(file);
+    index=0;
+    header_index=0;
+    while(1) //logic to prepare header
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m=='\r') continue;
+        if(m==',')
+        {
+            header_string[index]='\0';
+            mlfw_row_vec_string_set(*header,header_index,header_string);
+            header_index++;
+            index=0;
+            continue;
+        }
+        if(m=='\n')
+        {
+            header_string[index]='\0';
+            mlfw_row_vec_string_set(*header,header_index,header_string);
+            break;
+        }
+        header_string[index]=m;
+        index++;
+    }
+    //logic to prepare header ends here
     if(vector==NULL)
     {
         vector=mlfw_column_vec_string_create_new(columns);
@@ -231,7 +266,16 @@ mlfw_column_vec_string *mlfw_column_vec_string_from_csv(const char *csv_file_nam
         if(vector->size!=columns) return NULL;
     }
     rewind(file);
+    //logic to skip the header
+    while(1)
+    {
+        m=fgetc(file);
+        if(feof(file)) break;
+        if(m=='\r') continue;
+        if(m=='\n') break;
+    }
     c=0;
+    index=0;
     while(1)
     {
         m=fgetc(file);
