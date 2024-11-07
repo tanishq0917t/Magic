@@ -4,11 +4,12 @@
 #include<stdlib.h>
 int main()
 {
-    mlfw_column_vec_string * string_vec;
+    //mlfw_column_vec_string * string_vec;
+    mlfw_row_vec_string * string_vec;
     mlfw_row_vec_string *header;
-    string_vec=mlfw_column_vec_string_from_csv("string.csv",NULL,&header);
+    string_vec=mlfw_row_vec_string_from_csv("string.csv",NULL,&header);
     int header_size=mlfw_row_vec_string_get_size(header);
-    int vector_size=mlfw_column_vec_string_get_size(string_vec);
+    int vector_size=mlfw_row_vec_string_get_size(string_vec);
     printf("Header Size: %d\n",header_size);
     printf("Vector Size: %d\n",vector_size);
     char *ptr;
