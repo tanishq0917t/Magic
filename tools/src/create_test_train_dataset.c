@@ -1,4 +1,5 @@
 #include<mlfw_matrix.h>
+#include<mlfw_vector.h>
 #include<stdio.h>
 #include<stdlib.h>
 int main(int argc,char *argv[])
@@ -7,6 +8,7 @@ int main(int argc,char *argv[])
     mlfw_mat_double *matrix;
     mlfw_mat_double *minor_matrix;
     mlfw_mat_double *major_matrix;
+    mlfw_row_vec_string *header;
     dimension_t minor_rows;
     dimension_t major_rows;
     dimension_t shuffled_matrix_rows,shuffled_matrix_columns;
@@ -23,8 +25,7 @@ int main(int argc,char *argv[])
     test_file=argv[2];
     train_file=argv[3];
     minor_percentage=atoi(argv[4]);
-
-    matrix=mlfw_mat_double_from_csv(dataset_file);
+    matrix=mlfw_mat_double_from_csv(dataset_file,NULL,&header);
     mlfw_mat_double_get_dimension(matrix,&shuffled_matrix_rows,&shuffled_matrix_columns);
 
     if(matrix==NULL)
@@ -39,7 +40,7 @@ int main(int argc,char *argv[])
         return 0;
     }
     
-    shuffled_matrix=mlfw_mat_double_shuffle(matrix,3);
+    shuffled_matrix=mlfw_mat_double_shuffle(matrix,3,NULL);
     if(shuffled_matrix==NULL)
     {
         printf("Unable to create test/train data files\n");
@@ -69,8 +70,8 @@ int main(int argc,char *argv[])
     }
     mlfw_mat_double_copy(minor_matrix,shuffled_matrix,0,0,0,0,minor_rows-1,shuffled_matrix_columns-1);
     mlfw_mat_double_copy(major_matrix,shuffled_matrix,0,0,minor_rows,0,shuffled_matrix_rows-1,shuffled_matrix_columns-1);
-    mlfw_mat_double_to_csv(minor_matrix,test_file);
-    mlfw_mat_double_to_csv(major_matrix,train_file);
+    mlfw_mat_double_to_csv(minor_matrix,test_file,header);
+    mlfw_mat_double_to_csv(major_matrix,train_file,header);
 
     mlfw_mat_double_destroy(matrix);
     mlfw_mat_double_destroy(shuffled_matrix);
