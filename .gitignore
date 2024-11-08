@@ -1,2 +1,3 @@
 tanishq/o_files/*.o
-tanishq/lib/libtanishq.a
+tanishq/lib/*.*
+tanishq/testcases/*.out
