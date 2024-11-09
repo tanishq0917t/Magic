@@ -28,10 +28,12 @@ int main(int argc,char *argv[])
     if(scaled_matrix==NULL) 
     {
         mlfw_mat_double_destroy(matrix);
+        mlfw_row_vec_string_destroy(header);
         return 0;
     }
     mlfw_mat_double_to_csv(scaled_matrix,output_file,header);
     mlfw_mat_double_destroy(matrix);
     mlfw_mat_double_destroy(scaled_matrix);
+    mlfw_row_vec_string_destroy(header);
     return 0;
 }
